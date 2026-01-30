@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myshop
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  backend:
+    build: ./backend
+    ports:
+      - '3001:3001' # Changed backend port to 3001 to avoid conflict with frontend 3000
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/myshop
+      PORT: 3001
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_BASE_URL: http://localhost:3001/api # Frontend connects to backend on host machine
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
+  backend-test:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/myshop
+    depends_on:
+      - db
+    command: npm test
+
+volumes:
+  postgres_data:
