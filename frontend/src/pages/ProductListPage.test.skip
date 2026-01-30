@@ -1,0 +1,49 @@
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import ProductListPage from './ProductListPage';
+import { BrowserRouter as Router } from 'react-router-dom';
+import * as api from '../api/api'; // Import the api module
+
+// Mock the API call
+jest.mock('../api/api', () => ({
+  getProducts: jest.fn(() =>
+    Promise.resolve([
+      { id: '1', name: 'Test Product 1', description: 'Desc 1', price: 10.00 },
+      { id: '2', name: 'Test Product 2', description: 'Desc 2', price: 20.00 },
+    ])
+  ),
+}));
+
+describe('ProductListPage', () => {
+  test('renders product list heading', async () => {
+    render(
+      <Router>
+        <ProductListPage />
+      </Router>
+    );
+    expect(screen.getByText(/Product List/i)).toBeInTheDocument();
+    expect(screen.getByText(/Loading products.../i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Test Product 1/i)).toBeInTheDocument();
+      expect(screen.getByText(/Test Product 2/i)).toBeInTheDocument();
+    });
+  });
+
+  test('displays error message if fetching products fails', async () => {
+    // Mock getProducts to throw an error
+    (api.getProducts as jest.Mock).mockImplementationOnce(() =>
+      Promise.reject(new Error('API Error'))
+    );
+
+    render(
+      <Router>
+        <ProductListPage />
+      </Router>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Error: Failed to fetch products./i)).toBeInTheDocument();
+    });
+  });
+});

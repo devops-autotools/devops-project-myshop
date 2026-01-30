@@ -1,0 +1,66 @@
+/* frontend/src/App.css */
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.app-container {
+  min-height: 100vh;
+  background-color: #f3f4f6; /* Light gray background */
+}
+
+.navbar {
+  background-color: #2563eb; /* Blue-600 */
+  padding: 1rem; /* p-4 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* shadow-md */
+}
+
+.navbar-content {
+  max-width: 1200px; /* container mx-auto */
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: space-between; /* justify-between */
+  align-items: center; /* items-center */
+}
+
+.navbar-brand {
+  color: #ffffff; /* text-white */
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: bold; /* font-bold */
+}
+
+.navbar-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1rem; /* space-x-4 */
+}
+
+.navbar-link {
+  color: #ffffff; /* text-white */
+  transition: color 0.3s ease; /* transition duration-300 */
+}
+
+.navbar-link:hover {
+  color: #bfdbfe; /* hover:text-blue-200 */
+}
+
+.main-content {
+  max-width: 1200px; /* container mx-auto */
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2rem; /* mt-8 */
+  padding: 1rem; /* p-4 */
+}
