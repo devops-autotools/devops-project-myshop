@@ -42,3 +42,8 @@ Thumbs.db
 .cache/
 *.sqlite
 *.sqlite-journal
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/

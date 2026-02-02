@@ -1,39 +1,27 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine AS build
+# ---------- Build stage ----------
+FROM node:20-alpine AS build
 
-# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies, ensuring devDependencies are included for the build
-RUN NODE_ENV=development npm install
-
-# Copy the rest of the application code
 COPY . .
+RUN npm run build
 
-# Set the API base URL for the React app
-# This will be replaced during the build process
-ARG REACT_APP_API_BASE_URL
-ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
-# Build the React app for production
-# Ensure NODE_ENV is set to production for the actual build process
-RUN NODE_ENV=production npm run build
+# ---------- Runtime stage ----------
+FROM nginx:alpine
 
-# Use a lightweight web server to serve the built files
-FROM node:18-alpine
-WORKDIR /app
+# Remove default config
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Install 'serve' globally
-RUN npm install -g serve
+# Custom nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the build output from the build stage
-COPY --from=build /app/build ./build
+# Copy build output
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 80
 
-# Command to run the React app
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["nginx", "-g", "daemon off;"]

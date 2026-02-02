@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { getCart, checkout, removeCartItem } from '../api/api'; // Import removeCartItem
+import { getCart, checkout, removeCartItem, getAuthToken } from '../api/api'; // Import getAuthToken
 import './CartPage.css'; // Import custom CSS
 
 interface CartItem {
-  id: number;
   productId: number;
+  name: string;
+  price: number;
   quantity: number;
-  product: {
-    id: number;
-    name: string;
-    price: number;
-  };
 }
 
 interface Cart {
-  id: number;
-  userId: number;
+  userId: number; // Only userId is returned for consistency, actual cart is items array
   items: CartItem[];
 }
 
@@ -23,8 +18,17 @@ const CartPage: React.FC = () => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const fetchCart = async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setError('You need to be logged in to view your cart.');
+      setLoading(false);
+      setIsLoggedIn(false);
+      return;
+    }
+    setIsLoggedIn(true);
     try {
       const response = await getCart();
       setCart(response);
@@ -56,9 +60,9 @@ const CartPage: React.FC = () => {
     }
   };
 
-  const handleRemoveItem = async (cartItemId: number) => {
+  const handleRemoveItem = async (productId: number) => { // Changed from cartItemId to productId
     try {
-      await removeCartItem(cartItemId);
+      await removeCartItem(productId); // Pass productId
       alert('Item removed from cart!');
       fetchCart(); // Refresh cart to update the display
     } catch (err: any) {
@@ -66,6 +70,14 @@ const CartPage: React.FC = () => {
       console.error('Remove item error:', err);
     }
   };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="cart-page">
+        <p>You need to be logged in to view your cart.</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -83,7 +95,7 @@ const CartPage: React.FC = () => {
     );
   }
 
-  const total = cart?.items.reduce((sum, item) => sum + item.quantity * item.product.price, 0) || 0;
+  const total = cart?.items.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0; // Use item.price directly
 
   return (
     <div className="cart-page">
@@ -93,18 +105,18 @@ const CartPage: React.FC = () => {
       <div className="cart-items">
         {cart && cart.items.length > 0 ? (
           cart.items.map((item) => (
-            <div key={item.id} className="cart-item">
+            <div key={item.productId} className="cart-item"> {/* Use productId as key */}
               <div className="cart-item-details">
-                <h3>{item.product.name}</h3>
+                <h3>{item.name}</h3> {/* Use item.name directly */}
                 <p>Quantity: {item.quantity}</p>
                 <button 
                   className="remove-item-button" 
-                  onClick={() => handleRemoveItem(item.id)}
+                  onClick={() => handleRemoveItem(item.productId)} // Pass item.productId
                 >
                   Remove
                 </button>
               </div>
-              <p className="cart-item-price">${(item.quantity * item.product.price).toFixed(2)}</p>
+              <p className="cart-item-price">${(item.quantity * item.price).toFixed(2)}</p> {/* Use item.price directly */}
             </div>
           ))
         ) : (

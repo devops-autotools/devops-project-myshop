@@ -1,10 +1,9 @@
-import { defineConfig } from '@prisma/client/define-config';
+// prisma/prisma.config.ts
+import "dotenv/config"; // Recommended for loading .env files
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
   datasource: {
-    db: {
-      provider: 'postgresql',
-      url: process.env.DATABASE_URL,
-    },
+    url: env("DATABASE_URL"),
   },
 });

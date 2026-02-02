@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getProducts, addToCart } from '../api/api'; // Import addToCart
 import { Link } from 'react-router-dom';
 import './ProductList.css'; // Import custom CSS
@@ -15,20 +15,23 @@ const ProductListPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch (err) {
-        setError('Failed to fetch products.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (err) {
+      setError('Failed to fetch products. Please try again later.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleAddToCart = async (productId: string, productName: string) => {
     try {
@@ -42,16 +45,20 @@ const ProductListPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="loading-message">
-        <p>Loading products...</p>
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="error-message">
-        <p>Error: {error}</p>
+      <div className="error-container">
+        <h2 className="error-title">Oops! Something went wrong.</h2>
+        <p className="error-message">{error}</p>
+        <button className="retry-button" onClick={fetchProducts}>
+          Try Again
+        </button>
       </div>
     );
   }

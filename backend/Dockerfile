@@ -1,31 +1,47 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20
+# ---------- Build stage ----------
+FROM node:20-alpine AS build
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
+# Install dependencies first (cache-friendly)
 COPY package*.json ./
+RUN npm ci
 
-# Install any needed packages
-RUN npm install
-
-# Install postgresql-client for pg_isready
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
-
-# Copy the Prisma schema and run Prisma generate
-COPY prisma ./prisma
-RUN npx prisma generate
-
-# Copy the rest of the application's code
+# Copy source
 COPY . .
 
-# Make init-db.sh and start.sh executable after copying all files
-RUN chmod +x init-db.sh
+# Generate Prisma client
+RUN npx prisma generate
+
+
+# ---------- Runtime stage ----------
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -S app && adduser -S app -G app
+
+# Install tini and postgresql-client for pg_isready
+RUN apk add --no-cache tini postgresql-client curl
+
+# Copy only needed files
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/src ./src
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/wait-for-it.sh ./wait-for-it.sh
+COPY --from=build /app/start.sh ./start.sh
+COPY --from=build /app/init-db.sh ./init-db.sh
+
+# Make scripts executable
 RUN chmod +x start.sh
+RUN chmod +x wait-for-it.sh
+RUN chmod +x init-db.sh
 
-# Make port 3001 available to the world outside this container
-EXPOSE 3001
+USER app
 
-# Run the app when the container launches
-CMD ["/bin/sh", "-c", "./init-db.sh && ./start.sh"]
+EXPOSE 3000
+
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["./start.sh"]

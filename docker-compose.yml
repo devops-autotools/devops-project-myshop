@@ -1,6 +1,6 @@
-version: '3.8'
 services:
-  db:
+
+  postgres:
     image: postgres:13
     environment:
       POSTGRES_USER: user
@@ -10,39 +10,67 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - myshop-net
+
+  redis:
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+    networks:
+      - myshop-net
 
   backend:
     build: ./backend
     ports:
-      - '3001:3001' # Changed backend port to 3001 to avoid conflict with frontend 3000
+      - '3001:3000' # Map host port 3001 to container port 3000
     environment:
-      DATABASE_URL: postgresql://user:password@db:5432/myshop
-      PORT: 3001
+      DATABASE_URL: postgresql://user:password@postgres:5432/myshop
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: myshop
+      PORT: 3000 # Backend now listens on port 3000 inside the container
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     depends_on:
-      - db
+      - postgres
+      - redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"] # Update healthcheck port
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: always
+    networks:
+      - myshop-net
+    mem_limit: 1g # Add memory limit
 
   frontend:
     build:
       context: ./frontend
       args:
-        REACT_APP_API_BASE_URL: http://localhost:3001/api # Frontend connects to backend on host machine
+        REACT_APP_API_BASE_URL: http://localhost:3001/api # Re-add build arg
     ports:
-      - '3000:3000'
+      - '3000:80' # Map host port 3000 to container port 80 (Nginx)
     depends_on:
       - backend
+    restart: always
+    networks:
+      - myshop-net
 
   backend-test:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql://user:password@db:5432/myshop
+      DATABASE_URL: postgresql://user:password@postgres:5432/myshop
     depends_on:
-      - db
+      - postgres
     command: npm test
+    networks:
+      - myshop-net
 
 volumes:
   postgres_data:
+
+networks:
+  myshop-net:
+    driver: bridge

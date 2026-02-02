@@ -14,7 +14,7 @@ model User {
   name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  cart      Cart?
+  // cart      Cart? // Cart is now in Redis
   orders    Order[]
 }
 
@@ -25,29 +25,10 @@ model Product {
   price       Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  cartItems   CartItem[]
+  // cartItems   CartItem[] // Cart items are now in Redis
   orderItems  OrderItem[] // Add relation to OrderItem
 }
 
-model Cart {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int      @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  items     CartItem[]
-}
-
-model CartItem {
-  id        Int      @id @default(autoincrement())
-  product   Product  @relation(fields: [productId], references: [id])
-  productId Int
-  cart      Cart     @relation(fields: [cartId], references: [id])
-  cartId    Int
-  quantity  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
 model Order {
   id        Int      @id @default(autoincrement())

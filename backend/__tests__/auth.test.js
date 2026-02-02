@@ -1,8 +1,16 @@
 const request = require('supertest');
-const app = require('../src/app');
+const { app, server } = require('../src/app');
+const prisma = require('../src/utils/prisma');
+const redis = require('../src/utils/redis');
 
-afterAll((done) => {
-    app.close(done);
+beforeEach(async () => {
+    await prisma.user.deleteMany({});
+});
+
+afterAll(async () => {
+    await redis.disconnect();
+    await prisma.$disconnect();
+    await new Promise(resolve => server.close(resolve));
 });
 
 describe('Auth Endpoints', () => {
@@ -34,7 +42,7 @@ describe('Auth Endpoints', () => {
                 name: 'Test User'
             });
         expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('message', 'User already exists');
+        expect(res.body).toHaveProperty('message', 'User with that email already exists');
     });
 
     it('should login an existing user', async () => {

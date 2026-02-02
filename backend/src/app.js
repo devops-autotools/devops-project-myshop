@@ -23,15 +23,13 @@ app.get('/api/health', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 
-if (require.main === module) {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}
+const server = app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
 // Disconnect PrismaClient when the application closes
 process.on('beforeExit', async () => {
   await prisma.$disconnect();
 });
 
-module.exports = { app }; // Export only app, prisma is now imported directly where needed
+module.exports = { app, server }; // Export only app, prisma is now imported directly where needed
