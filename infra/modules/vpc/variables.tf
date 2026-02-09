@@ -8,6 +8,12 @@ variable "project" {
   description = "The name of the project"
 }
 
+variable "name_prefix" {
+  type        = string
+  description = "Optional name prefix for resource Name tags"
+  default     = ""
+}
+
 variable "cidr_block" {
   type        = string
   description = "The CIDR block for the VPC"
@@ -23,5 +29,4 @@ variable "tags" {
   description = "A map of tags to assign to resources"
   default     = {}
 }
-
 

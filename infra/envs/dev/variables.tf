@@ -1,4 +1,4 @@
-# Variables for main.VPC environment
+# Variables for dev environment
 variable "environment" {
   description = "The environment for the deployment (e.g., dev, staging, prod)"
   type        = string
@@ -6,6 +6,15 @@ variable "environment" {
 variable "project" {
   description = "The name of the project"
   type        = string
+}
+variable "region" {
+  description = "AWS region for the environment"
+  type        = string
+}
+variable "name_prefix" {
+  description = "Optional name prefix for resource Name tags"
+  type        = string
+  default     = ""
 }
 variable "vpc_cidr_block" {
   description = "The CIDR block for the VPC"
@@ -22,4 +31,3 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
-# --- IGNORE ---

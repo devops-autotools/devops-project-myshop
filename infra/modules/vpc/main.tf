@@ -1,3 +1,13 @@
+locals {
+  name_prefix = var.name_prefix != "" ? var.name_prefix : "${var.environment}.${var.project}"
+  base_tags = {
+    Environment = var.environment
+    Project     = var.project
+    ManagedBy   = "Terraform"
+  }
+  tags = merge(local.base_tags, var.tags)
+}
+
 # VPC resource
 resource "aws_vpc" "this" {
   cidr_block           = var.cidr_block
@@ -5,9 +15,9 @@ resource "aws_vpc" "this" {
   enable_dns_hostnames = true
   tags = merge(
     {
-      Name = "vpc.${var.environment}.${var.project}"
+      Name = "${local.name_prefix}.vpc"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -20,9 +30,9 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.public.subnet-${count.index + 1}"
+      Name = "${local.name_prefix}.public.subnet-${count.index + 1}"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -35,9 +45,9 @@ resource "aws_subnet" "app_private" {
   map_public_ip_on_launch = false
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.app.private.subnet-${count.index + 1}"
+      Name = "${local.name_prefix}.app.private.subnet-${count.index + 1}"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -49,9 +59,9 @@ resource "aws_subnet" "db_private" {
   availability_zone = var.azs[count.index]
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.db.private.subnet-${count.index + 1}"
+      Name = "${local.name_prefix}.db.private.subnet-${count.index + 1}"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -60,9 +70,9 @@ resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.igw"
+      Name = "${local.name_prefix}.igw"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -70,9 +80,9 @@ resource "aws_internet_gateway" "this" {
 resource "aws_eip" "nat" {
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.nat.eip"
+      Name = "${local.name_prefix}.nat.eip"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -84,9 +94,9 @@ resource "aws_nat_gateway" "this" {
   subnet_id         = aws_subnet.public[0].id
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.nat.gateway"
+      Name = "${local.name_prefix}.nat.gateway"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -99,9 +109,9 @@ resource "aws_route_table" "public" {
     }
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.public.rt"
+      Name = "${local.name_prefix}.public.rt"
     },
-    var.tags
+    local.tags
   )
 }
 
@@ -114,9 +124,9 @@ resource "aws_route_table" "private" {
     }
   tags = merge(
     {
-      Name = "${var.environment}.${var.project}.private.rt"
+      Name = "${local.name_prefix}.private.rt"
     },
-    var.tags
+    local.tags
   )
 }
 

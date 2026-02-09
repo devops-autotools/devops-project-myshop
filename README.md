@@ -65,7 +65,7 @@ myshop/
 ├── frontend/
 ├── backend/
 ├── docker-compose.yml
-├── terraform/
+├── infra/
 └── README.md
 ```
 
