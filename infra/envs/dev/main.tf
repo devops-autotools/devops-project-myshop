@@ -9,3 +9,12 @@ module "vpc" {
   name_prefix = local.name_prefix
   tags        = local.tags
 }
+
+# Module for managing IAM roles in different environments
+module "role" {
+  source = "../../modules/role"
+  environment = var.environment
+  project     = var.project
+  name_prefix = local.name_prefix
+  tags        = local.tags
+}
