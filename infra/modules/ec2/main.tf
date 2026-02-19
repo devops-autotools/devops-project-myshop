@@ -9,17 +9,10 @@ locals {
 }
 
 resource "aws_instance" "app_server" {
-  ami                         = var.ami_id
-  instance_type               = var.instance_type
-  availability_zone          = var.availability_zones[0]
-  subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = var.security_group_ids
-  key_name                    = var.key_name
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.name_prefix}-app-server"
-    }
-  )
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  subnet_id     = var.subnet_ids
+  vpc_security_group_ids = var.security_group_ids
+  iam_instance_profile = var.iam_instance_profile
+  tags = local.tags
 }

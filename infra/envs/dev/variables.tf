@@ -31,3 +31,35 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "ingress_rules" {
+  description = "Ingress rules for security group"
+  type = list(object({
+    from_port = number
+    to_port   = number
+    protocol  = string
+    cidr_blocks      = list(string)
+  }))
+  default = []
+}
+
+variable "egress_rules" {
+  description = "Egress rules for security group"
+  type = list(object({
+    from_port = number
+    to_port   = number
+    protocol  = string
+    cidr_blocks      = list(string)
+  }))
+  default = []
+}
+
+variable "ami_id" {
+  description = "The AMI ID for the EC2 instance"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "The type of EC2 instance to launch"
+  type        = string
+}

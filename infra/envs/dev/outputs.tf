@@ -1,3 +1,5 @@
+# Outputs for the VPC module in the development environment
+
 output "vpc_id" {
   description = "The ID of the VPC"
   value       = module.vpc.vpc_id
@@ -71,4 +73,39 @@ output "public_route_table_id" {
 output "private_route_table_id" {
   description = "The ID of the private route table"
   value       = module.vpc.private_route_table_id
+}
+
+# Output Role ARN for SSM Access
+# output "ssm_role_arn" {
+#   description = "The ARN of the IAM Role for SSM Access"
+#   value       = module.role.ssm_role_arn
+# }
+
+output "ssm_instance_profile_name" {
+  description = "The name of the IAM Instance Profile for SSM Access"
+  value       = module.role.instance_profile_name
+}
+
+# Output for Security Group ID
+output "app_security_group_id" {
+  description = "The ID of the application security group"
+  value       = module.security_group.security_group_id
+}
+
+# Output for Security Group ARN
+output "app_security_group_arn" {
+  description = "The ARN of the application security group"
+  value       = module.security_group.security_group_arn
+}
+
+# Output for EC2 Instance ID
+output "ec2_instance_id" {
+  description = "The ID of the EC2 instance"
+  value       = module.ec2.instance_id
+} 
+
+# Output for EC2 Instance Public IP
+output "ec2_public_ip" {
+  description = "The public IP address of the EC2 instance"
+  value       = module.ec2.public_ip
 }
