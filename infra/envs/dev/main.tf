@@ -12,7 +12,7 @@ module "vpc" {
 
 # Module for managing IAM roles in different environments
 module "role" {
-  source = "../../modules/role"
+  source      = "../../modules/role"
   environment = var.environment
   project     = var.project
   name_prefix = local.name_prefix
@@ -23,21 +23,23 @@ module "role" {
 module "security_group" {
   source        = "../../modules/security_group"
   vpc_id        = module.vpc.vpc_id
-  environment = var.environment
-  project     = var.project
-  ingress_rules = var.ingress_rules
-  egress_rules  = var.egress_rules
+  environment   = var.environment
+  project       = var.project
+  security_groups = var.security_groups
   tags          = local.tags
 }
 
 module "ec2" {
-  source        = "../../modules/ec2"
+  source               = "../../modules/ec2"
   ami_id               = var.ami_id
   instance_type        = var.instance_type
-  subnet_ids     = module.vpc.public_subnet_ids[0]
-  security_group_ids = [module.security_group.security_group_id]
+  subnet_ids           = module.vpc.public_subnet_ids[0]
+  security_group_ids   = [module.security_group.security_group_id["app"]]
   iam_instance_profile = module.role.instance_profile_name
-  environment   = var.environment
-  project       = var.project
-  tags          = local.tags
+  environment          = var.environment
+  project              = var.project
+  repo_url  = var.repo_url
+  repo_name = var.repo_name
+  default_user = var.default_user
+  tags                 = local.tags
 }

@@ -43,6 +43,22 @@ variable "iam_instance_profile" {
   type        = string
 }
 
+# Variables for user data script
+variable "repo_url" {
+  type        = string
+  description = "Git repository URL"
+}
+
+variable "repo_name" {
+  type        = string
+  description = "Repository folder name"
+}
+
+variable "default_user" {
+  type        = string
+  description = "Default user to create on the EC2 instance"
+}
+
 # Tags variable
 variable "tags" {
   description = "A map of tags to assign to resources"

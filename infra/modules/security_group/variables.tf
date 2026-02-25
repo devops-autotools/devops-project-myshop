@@ -30,25 +30,24 @@ variable "vpc_id" {
   type        = string
 }
 
-# Variable for ingress rules
-variable "ingress_rules" {
-  description = "Ingress rules for security group"
-  type = list(object({
-    from_port = number
-    to_port   = number
-    protocol  = string
-    cidr_blocks      = list(string)
-  }))
-  default = []
-}
+variable "security_groups" {
+  type = map(object({
+    description = string
 
-variable "egress_rules" {
-  description = "Egress rules for security group"
-  type = list(object({
-    from_port = number
-    to_port   = number
-    protocol  = string
-    cidr_blocks      = list(string)
+    ingress_rules = list(object({
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = optional(list(string))
+      sg_ids      = optional(list(string))
+    }))
+
+    egress_rules = list(object({
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = optional(list(string))
+      sg_ids      = optional(list(string))
+    }))
   }))
-  default = []
 }

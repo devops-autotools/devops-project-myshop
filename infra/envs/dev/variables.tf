@@ -32,27 +32,11 @@ variable "tags" {
   default     = {}
 }
 
-variable "ingress_rules" {
-  description = "Ingress rules for security group"
-  type = list(object({
-    from_port = number
-    to_port   = number
-    protocol  = string
-    cidr_blocks      = list(string)
-  }))
-  default = []
+variable "security_groups" {
+  description = "A map of security group configurations"
+  type = any
 }
 
-variable "egress_rules" {
-  description = "Egress rules for security group"
-  type = list(object({
-    from_port = number
-    to_port   = number
-    protocol  = string
-    cidr_blocks      = list(string)
-  }))
-  default = []
-}
 
 variable "ami_id" {
   description = "The AMI ID for the EC2 instance"
@@ -62,4 +46,19 @@ variable "ami_id" {
 variable "instance_type" {
   description = "The type of EC2 instance to launch"
   type        = string
+}
+
+variable "repo_url" {
+  type        = string
+  description = "Git repository URL"
+}
+
+variable "repo_name" {
+  type        = string
+  description = "Repository folder name"
+}
+
+variable "default_user" {
+  type        = string
+  description = "Default user to create on the EC2 instance"
 }

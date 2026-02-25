@@ -10,9 +10,9 @@ locals {
 
 # IAM Role SSM Access
 resource "aws_iam_role" "ssm_role" {
-    name = "${local.name_prefix}-ssm-role"
-    assume_role_policy = data.aws_iam_policy_document.ssm_assume_role_policy.json
-    tags = local.tags
+  name               = "${local.name_prefix}-ssm-role"
+  assume_role_policy = data.aws_iam_policy_document.ssm_assume_role_policy.json
+  tags               = local.tags
 }
 
 # Data source for SSM Assume Role Policy
@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "ssm_assume_role_policy" {
 # IAM Policy for SSM
 resource "aws_iam_role_policy_attachment" "ssm_role_attachment" {
   role       = aws_iam_role.ssm_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # Instance Profile for the Role

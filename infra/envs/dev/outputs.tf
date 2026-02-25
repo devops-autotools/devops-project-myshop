@@ -102,7 +102,7 @@ output "app_security_group_arn" {
 output "ec2_instance_id" {
   description = "The ID of the EC2 instance"
   value       = module.ec2.instance_id
-} 
+}
 
 # Output for EC2 Instance Public IP
 output "ec2_public_ip" {

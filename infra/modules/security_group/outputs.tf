@@ -1,11 +1,11 @@
-# Output for Security Group ID
+# Output for the security group ID
 output "security_group_id" {
-  description = "The ID of the application security group"
-  value       = aws_security_group.app_sg.id
+  description = "A map of security group IDs created by this module"
+  value       = { for sg_name, sg in aws_security_group.sg : sg_name => sg.id }
 }
 
-# Output for Security Group ARN
+# Output for the security group ARN
 output "security_group_arn" {
-  description = "The ARN of the application security group"
-  value       = aws_security_group.app_sg.arn
+  description = "A map of security group ARNs created by this module"
+  value       = { for sg_name, sg in aws_security_group.sg : sg_name => sg.arn }
 }
