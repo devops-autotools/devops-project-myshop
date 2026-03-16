@@ -62,3 +62,31 @@ variable "default_user" {
   type        = string
   description = "Default user to create on the EC2 instance"
 }
+
+# RDS variables
+variable "db_name" { 
+  description = "The name of the database"
+  type = string 
+}
+
+variable "db_username" { 
+  description = "The username for the database"
+  type = string 
+}
+
+variable "db_password" { 
+  description = "The password for the database"
+  type = string 
+  sensitive = true 
+}
+
+variable "db_instance_class" { 
+  description = "The instance class for the RDS instance"
+  type = string 
+  default = "db.t3.micro" 
+}
+variable "db_storage" { 
+  description = "The allocated storage for the RDS instance in GB"
+  type = number 
+  default = 20 
+}

@@ -43,3 +43,25 @@ module "ec2" {
   default_user = var.default_user
   tags                 = local.tags
 }
+
+module "rds" {
+  source = "../../modules/rds"
+
+  environment = var.environment
+  project     = var.project
+  name_prefix = local.name_prefix
+  tags        = local.tags
+
+  db_name           = var.db_name
+  username          = var.db_username
+  password          = var.db_password # Nên dùng Secret Manager nếu làm dự án thật
+  instance_class    = var.db_instance_class
+  allocated_storage = var.db_storage
+
+  # Lấy danh sách Subnet DB từ module VPC
+  private_subnet_ids = module.vpc.db_private_subnet_ids
+  
+  # Lấy Security Group "db" đã được tạo từ module security_group
+  vpc_security_group_ids = [module.security_group.security_group_id["db"]]
+  app_security_group_id  = module.security_group.security_group_id["app"]
+}

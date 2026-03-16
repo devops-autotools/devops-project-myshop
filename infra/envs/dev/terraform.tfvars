@@ -106,3 +106,10 @@ instance_type = "t3.micro"
 repo_url  = "https://github.com/devops-autotools/devops-project-myshop.git"
 repo_name    = "devops-project-myshop"
 default_user = "ubuntu"
+
+# RDS Configuration
+db_name           = "myshopdb"
+db_username       = "postgres"
+db_password       = "YourSecurePassword123" # Nên dùng env var TF_VAR_db_password
+db_instance_class = "db.t3.micro"
+db_storage        = 20
